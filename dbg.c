@@ -9,6 +9,10 @@ FILE *_output = NULL;
 void
 _dbg (char *format, ...)
 {
+	#ifndef NO_COLOR
+	console_set_col(0x02);
+	#endif
+
 	if (!_output)
 		_output = stdout;
 
@@ -18,6 +22,10 @@ _dbg (char *format, ...)
         vfprintf (_output, format, args);
         fflush (_output);
     va_end (args);
+
+	#ifndef NO_COLOR
+	console_set_col(0x07);
+	#endif
 }
 
 void
