@@ -5,32 +5,78 @@
 #include "Utils/Utils.h"
 
 // ---------- Defines -------------
-#define __DBG_ACTIVATED__ TRUE
-
 #if __DBG_ACTIVATED__ == TRUE
-	#ifdef __DEBUG_OBJECT__
-		#define dbg(format, ...) 	\
-			_dbg("[" __DEBUG_OBJECT__ "] " format "\n", ##__VA_ARGS__)
-	#else
-		#define dbg(format, ...) 	\
-			_dbg("[%s] " format "\n", ((strrchr(__FILE__, '\\')) != NULL) ? &(strrchr(__FILE__, '\\'))[1] : __FILE__, ##__VA_ARGS__)
-	#endif
+    #ifdef __DEBUG_OBJECT__
+        #define dbg(format, ...)                                                                        \
+            do {                                                                                        \
+                char __time_buffer__[20] = {0};                                                         \
+                get_now_buffer(__time_buffer__);                                                        \
+                _dbg("[%s][%20s:%30s] " format "\n",                                                    \
+                    __time_buffer__,                                                                    \
+                    __DEBUG_OBJECT__,                                                                   \
+                    __FUNCTION__,                                                                       \
+                    ##__VA_ARGS__);                                                                     \
+            } while (0);
+    #else
+        #define dbg(format, ...)                                                                        \
+            do {                                                                                        \
+                char __time_buffer__[20] = {0};                                                         \
+                get_now_buffer(__time_buffer__);                                                        \
+                _dbg("[%s][%20s:%30s] " format "\n",                                                    \
+                        __time_buffer__,                                                                \
+                        ((strrchr(__FILE__, '\\')) != NULL) ? &(strrchr(__FILE__, '\\'))[1] : __FILE__, \
+                        __FUNCTION__,                                                                   \
+                        ##__VA_ARGS__);                                                                 \
+            } while (0);
+    #endif
 
-	#ifdef __DEBUG_OBJECT__
-		#define fail(format, ...) 	\
-			_fail("[FAIL] [" __DEBUG_OBJECT__ "] " format "\n", ##__VA_ARGS__)
-	#else
-		#define fail(format, ...) 	\
-			_fail("[FAIL] [%s] " format "\n", ((strrchr(__FILE__, '\\')) != NULL) ? &(strrchr(__FILE__, '\\'))[1] : __FILE__, ##__VA_ARGS__)
-	#endif
+    #ifdef __DEBUG_OBJECT__
+        #define fail(format, ...)                                                                       \
+            do {                                                                                        \
+                char __time_buffer__[20] = {0};                                                         \
+                get_now_buffer(__time_buffer__);                                                        \
+                _fail("[%s][%20s:%30s] [FAIL] " format "\n",                                            \
+                        __time_buffer__,                                                                \
+                        __DEBUG_OBJECT__,                                                               \
+                        __FUNCTION__,                                                                   \
+                        ##__VA_ARGS__);                                                                 \
+            } while (0);
+    #else
+        #define fail(format, ...)                                                                       \
+            do {                                                                                        \
+                char __time_buffer__[20] = {0};                                                         \
+                get_now_buffer(__time_buffer__);                                                        \
+            _fail("[%s][%20s:%30s] [FAIL] " format "\n",                                                \
+                    __time_buffer__,                                                                    \
+                    ((strrchr(__FILE__, '\\')) != NULL) ? &(strrchr(__FILE__, '\\'))[1] : __FILE__,     \
+                    __FUNCTION__,                                                                       \
+                    ##__VA_ARGS__);                                                                     \
+            } while (0);
+    #endif
 
-	#ifdef __DEBUG_OBJECT__
-		#define warn(format, ...) 	\
-			_warn("[" __DEBUG_OBJECT__ "] " format "\n", ##__VA_ARGS__)
-	#else
-		#define warn(format, ...) 	\
-			_warn("[%s] " format "\n", ((strrchr(__FILE__, '\\')) != NULL) ? &(strrchr(__FILE__, '\\'))[1] : __FILE__, ##__VA_ARGS__)
-	#endif
+    #ifdef __DEBUG_OBJECT__
+        #define warn(format, ...)                                                                       \
+            do {                                                                                        \
+                char __time_buffer__[20] = {0};                                                         \
+                get_now_buffer(__time_buffer__);                                                        \
+            _warn("[%s][%20s:%30s] [WARN] " format "\n",                                                \
+                    __time_buffer__,                                                                    \
+                    __DEBUG_OBJECT__,                                                                   \
+                    __FUNCTION__,                                                                       \
+                    ##__VA_ARGS__);                                                                     \
+            } while (0);
+    #else
+        #define warn(format, ...)                                                                       \
+            do {                                                                                        \
+                char __time_buffer__[20] = {0};                                                         \
+                get_now_buffer(__time_buffer__);                                                        \
+            _warn("[%s][%20s:%30s] [WARN] " format "\n",                                                \
+                    __time_buffer__,                                                                    \
+                    ((strrchr(__FILE__, '\\')) != NULL) ? &(strrchr(__FILE__, '\\'))[1] : __FILE__,     \
+                    __FUNCTION__,                                                                       \
+                    ##__VA_ARGS__);                                                                     \
+            } while (0);
+    #endif
 #else
 	#define dbg(format, ...)
 	#define fail(format, ...)
