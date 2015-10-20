@@ -1,92 +1,1 @@
-#pragma once
-
-// ---------- Includes ------------
-#include <stdio.h>
-#include "Utils/Utils.h"
-
-// ---------- Defines -------------
-#if __DBG_ACTIVATED__ == TRUE
-    #ifdef __DEBUG_OBJECT__
-        #define dbg(format, ...)                                                                        \
-            do {                                                                                        \
-                char __time_buffer__[20] = {0};                                                         \
-                get_now_buffer(__time_buffer__);                                                        \
-                _dbg("[%s][%20s:%30s] " format "\n",                                                    \
-                    __time_buffer__,                                                                    \
-                    __DEBUG_OBJECT__,                                                                   \
-                    __FUNCTION__,                                                                       \
-                    ##__VA_ARGS__);                                                                     \
-            } while (0);
-    #else
-        #define dbg(format, ...)                                                                        \
-            do {                                                                                        \
-                char __time_buffer__[20] = {0};                                                         \
-                get_now_buffer(__time_buffer__);                                                        \
-                _dbg("[%s][%20s:%30s] " format "\n",                                                    \
-                        __time_buffer__,                                                                \
-                        ((strrchr(__FILE__, '\\')) != NULL) ? &(strrchr(__FILE__, '\\'))[1] : __FILE__, \
-                        __FUNCTION__,                                                                   \
-                        ##__VA_ARGS__);                                                                 \
-            } while (0);
-    #endif
-
-    #ifdef __DEBUG_OBJECT__
-        #define fail(format, ...)                                                                       \
-            do {                                                                                        \
-                char __time_buffer__[20] = {0};                                                         \
-                get_now_buffer(__time_buffer__);                                                        \
-                _fail("[%s][%20s:%30s] [FAIL] " format "\n",                                            \
-                        __time_buffer__,                                                                \
-                        __DEBUG_OBJECT__,                                                               \
-                        __FUNCTION__,                                                                   \
-                        ##__VA_ARGS__);                                                                 \
-            } while (0);
-    #else
-        #define fail(format, ...)                                                                       \
-            do {                                                                                        \
-                char __time_buffer__[20] = {0};                                                         \
-                get_now_buffer(__time_buffer__);                                                        \
-            _fail("[%s][%20s:%30s] [FAIL] " format "\n",                                                \
-                    __time_buffer__,                                                                    \
-                    ((strrchr(__FILE__, '\\')) != NULL) ? &(strrchr(__FILE__, '\\'))[1] : __FILE__,     \
-                    __FUNCTION__,                                                                       \
-                    ##__VA_ARGS__);                                                                     \
-            } while (0);
-    #endif
-
-    #ifdef __DEBUG_OBJECT__
-        #define warn(format, ...)                                                                       \
-            do {                                                                                        \
-                char __time_buffer__[20] = {0};                                                         \
-                get_now_buffer(__time_buffer__);                                                        \
-            _warn("[%s][%20s:%30s] [WARN] " format "\n",                                                \
-                    __time_buffer__,                                                                    \
-                    __DEBUG_OBJECT__,                                                                   \
-                    __FUNCTION__,                                                                       \
-                    ##__VA_ARGS__);                                                                     \
-            } while (0);
-    #else
-        #define warn(format, ...)                                                                       \
-            do {                                                                                        \
-                char __time_buffer__[20] = {0};                                                         \
-                get_now_buffer(__time_buffer__);                                                        \
-            _warn("[%s][%20s:%30s] [WARN] " format "\n",                                                \
-                    __time_buffer__,                                                                    \
-                    ((strrchr(__FILE__, '\\')) != NULL) ? &(strrchr(__FILE__, '\\'))[1] : __FILE__,     \
-                    __FUNCTION__,                                                                       \
-                    ##__VA_ARGS__);                                                                     \
-            } while (0);
-    #endif
-#else
-	#define dbg(format, ...)
-	#define fail(format, ...)
-	#define warn(format, ...)
-#endif
-
-void _dbg  (char *format, ...);
-void _fail (char *format, ...);
-void _warn (char *format, ...);
-
-void dbg_set_output (FILE *output);
-
-// ----------- Methods ------------
+/** * @file dbg.h * @brief Provides debug and dump functions * * Provides debug functions with multiple levels and dump utilities. * * @license <license placeholder> */#pragma once// ---------- Includes ------------#include <stdio.h>typedef enum {    DBG_LEVEL_INFO,    DBG_LEVEL_DEBUG,    DBG_LEVEL_WARNING,    DBG_LEVEL_ERROR,    DBG_LEVEL_SPECIAL,    DBG_LEVEL_IMPORTANT} DbgLevel;// ---------- Defines -------------#define __DBG_ACTIVATED__ TRUE/** Get the name of the module object from the filename.    __FILE__ differs between GCC on MinGW and GCC on Linux. */#ifdef WIN32#include <windows.h>#define __FILENAME__1 (((strrchr(__FILE__, '\\')) != NULL) ? &(strrchr(__FILE__, '\\'))[1] : __FILE__)#define __FILENAME__ (((strrchr(__FILENAME__1, '/')) != NULL) ? &(strrchr(__FILENAME__1, '/'))[1] : __FILENAME__1)#else#define __FILENAME__ (((strrchr(__FILE__,  '/')) != NULL) ? &(strrchr(__FILE__,  '/'))[1] : __FILE__)#endif/** Debug line template */#define dbg_ex(level, output, format, ...)                            \    do {                                                              \        _dbg (level, output, "[%s:%d in %s] " format,                 \            __FILENAME__,                                             \            __LINE__,                                                 \            __FUNCTION__,                                             \            ##__VA_ARGS__);                                           \    } while (0)/** Debug line template */#define dbg_ex2(level, output, format, ...)                           \    do {                                                              \        _dbg (level, output, format,                                  \            ##__VA_ARGS__);                                           \    } while (0)/** Buffer dump template */#define buffer_print_ex(buffer, size, prefix)                                \    do {                                                                     \        _buffer_print (                                                      \             buffer,                                                         \             size,                                                           \             prefix,                                                         \            __FILENAME__,                                                    \            __LINE__,                                                        \            __FUNCTION__);                                                   \    } while (0)#if defined(__DBG_ACTIVATED__) && __DBG_ACTIVATED__ == TRUE    // Declare debug functions here    /** Basic level debug function. */    #define dbg(format, ...)                                              \        dbg_ex (DBG_LEVEL_DEBUG, stdout, format "\n", ##__VA_ARGS__)    /** Green printf. */    #define green_printf(format, ...)                                              \        dbg_ex2 (DBG_LEVEL_INFO, stdout, format, ##__VA_ARGS__)    /** Red printf. */    #define red_printf(format, ...)                                              \        dbg_ex2 (DBG_LEVEL_ERROR, stdout, format, ##__VA_ARGS__)    /** Yellow printf. */    #define yellow_printf(format, ...)                                              \        dbg_ex2 (DBG_LEVEL_WARNING, stdout, format, ##__VA_ARGS__)    /** Important level debug function. */    #define important(format, ...)                                              \        dbg_ex (DBG_LEVEL_IMPORTANT, stdout, format "\n", ##__VA_ARGS__)    /** Warning level debug function. */    #define warning(format, ...)                                          \        dbg_ex (DBG_LEVEL_WARNING, stderr, "[WARNING] " format "\n", ##__VA_ARGS__)    /** Error level debug function. */    #define error(format, ...)                                            \        dbg_ex (DBG_LEVEL_ERROR, stderr, "[ERROR] " format "\n", ##__VA_ARGS__)    /** Special level debug function. */    #define special(format, ...)                                            \        dbg_ex (DBG_LEVEL_SPECIAL, stdout, "[SPECIAL] " format "\n", ##__VA_ARGS__)    /** Fatal error level debug function. */    #define die(format, ...)                                              \        do {                                                              \            dbg_ex (DBG_LEVEL_ERROR, stderr, "[FATAL ERROR] " format "\n", ##__VA_ARGS__); \            exit (-1);                                                    \        } while (0)    #define pause() \        do {info ("Pause ... Press any key."); fgetc (stdin);} while (0)    /** Error level debug function. */    #define error_pause(format, ...)                                            \        do {error (format, ##__VA_ARGS__); pause (); } while (0)    /** Error level debug function. */    #define warning_pause(format, ...)                                            \        do {warning (format, ##__VA_ARGS__); pause (); } while (0)    /** Error level debug function. */    #define info_pause(format, ...)                                            \        do {info (format, ##__VA_ARGS__); pause (); } while (0)    /** Dump a buffer into the standard output.     * See _buffer_print for the arguments documentation. */    #define buffer_print(buffer, size, prefix) \        buffer_print_ex (buffer, size, prefix)#else    // Don't output anything if __DBG_ACTIVATED__ is not enabled	#define dbg(format, ...)	#define warning(format, ...)    #define error(format, ...)    #define important(format, ...)	#define die(format, ...)	#define buffer_print(format, ...)    #define special(format, ...)    #define warning_pause(format, ...)    #define info_pause(format, ...)	#define error_pause(format, ...)    #define green_printf(format, ...)    #define pause()#endif/** Info level debug function. Not a debug information */#define info(format, ...)                                          \    dbg_ex (DBG_LEVEL_INFO, stdout, format "\n", ##__VA_ARGS__)// ----------- Functions ------------/** * @brief Output a formated message to a chosen stream * @param level The debug level * @param output A destination stream * @param format the format of the message * @return */void _dbg (    int level,    FILE *output,    const char *format,    ...);/** * @brief Dump a buffer in the standard output * @param buffer An allocated buffer to dump * @param bufferSize The buffer size * @param prefix A string printed before each line of the dump (optional) * @param filename The name of the file * @param lineNumber The line number * @param functionName The function name * @return */void_buffer_print (    void *buffer,    int bufferSize,    const char *prefix,    const char *filename,    int lineNumber,    const char *functionName);void dbg_setWindows (int isWindows);void dbg_enableDebug (int enable);int dbg_isEnabled (void);
