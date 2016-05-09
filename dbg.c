@@ -159,6 +159,10 @@ void crashHandler(int sig, siginfo_t *siginfo, void *_context) {
     int exceptionCode = siginfo->si_errno;
     ucontext_t *context = (ucontext_t*) _context;
     uintptr_t ip = context->uc_mcontext.gregs[REG_RIP];
+    
+    // Avoid unused variables warning
+    (void) ip;
+    (void) exceptionCode;
 
     if (sig == SIGABRT) {
         printTrace();
