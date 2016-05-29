@@ -163,6 +163,7 @@ void crashHandler(int sig, siginfo_t *siginfo, void *_context) {
 #else
     uintptr_t ip = context->uc_mcontext.gregs[REG_EIP];
 #endif    
+
     // Avoid unused variables warning
     (void) ip;
     (void) exceptionCode;
