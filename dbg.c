@@ -129,8 +129,13 @@ _bufferPrint(void *buffer, int bufferSize, char *prefix) {
 /* Crash handlers */
 #if defined(WIN32) || defined(__CYGWIN__)
 LONG WINAPI crashHandler(EXCEPTION_POINTERS *ExceptionInfo) {
+    #ifdef __x86_64__
     die("Application crashed at %p. Exception code = %x",
          ExceptionInfo->ContextRecord->Rip, ExceptionInfo->ExceptionRecord->ExceptionCode);
+    #else
+    die("Application crashed at %p. Exception code = %x",
+         ExceptionInfo->ContextRecord->Eip, ExceptionInfo->ExceptionRecord->ExceptionCode);
+    #endif
 
     return EXCEPTION_EXECUTE_HANDLER;
 }
